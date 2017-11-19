@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>试一试</title>
+    <style>
+        input {
+            width: 200px;
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+<span>请输入身份证:</span>
+<input id='idCard' type="text">
+<button id="test">开始猜测</button>
+<div id="infoShow">
+</div>
+</body>
+<script type="text/javascript">
+    /*
+    * 如果为真实身份证号，那么翻阅公民身份证规定第15位到第17位为顺序号 即同一地址码下，同年同月同日出生的人的顺序号，第1位到第6位是地址码，如果能得到当地所有的出生人口记录，排除没有31号的月份找到其余31号出生人数大于等于251人的月份可以极大缩小范围，但是仍无法有唯一解，此外如果92年时大多数农村生育不会在医院登记都是出生以后一段时间才会办户口，也会影响结果。
+    * */
+    let idCard = document.getElementById('idCard');
+    let test = document.getElementById('test');
+
+
+    function bindView(Ary) {
+        return ` <span style="font-weight: bold">可能的星座为：</span>
+<ul>
+    ${Ary.map((item) => {
+            return '<li><span>'+item+'</span></li>'})}
+    </ul>`
+    }
+
+    function noInput(e) {
+        if (e.keyCode >= 48 && e.keyCode <= 57) e.preventDefault();
+    }
+
+    idCard.addEventListener('input', function (e) {
+        if (idCard.value.length >= 18) {
+            idCard.addEventListener('keydown', noInput, false)
+        } else {
+            idCard.removeEventListener('keydown', noInput)
+        }
+    }, false)
+    test.addEventListener('click', function () {
+        let idCardInfo = idCard.value;
+        let birthDateYears = idCardInfo[6] + idCardInfo[7] + idCardInfo[8] + idCardInfo[9],
+            defaultAry = [],
+            infoShow = document.getElementById('infoShow'),
+            birthDateMonth = idCardInfo[10] + idCardInfo[11],
+            birthDateDays = idCardInfo[12] + idCardInfo[13];
+        let Asts = {
+            01: {
+                ast: [{astName: '摩羯', duration: 19}, 19, {astName: '水瓶', duration: 12}]
+            },
+            02: {
+                ast: [{astName: '水瓶', duration: 18}, 18, {
+                    astName: '双鱼',
+                    duration: birthDateYears % 100 === 0 ? (birthDateYears % 400 === 0 ? 11 : 10) : (birthDateYears % 4 === 0 ? 11 : 10)
+                }]
+            },
+            03: {
+                ast: [{astName: '双鱼', duration: 20}, 20, {astName: '白羊', duration: 11}]
+            },
+            04: {
+                ast: [{astName: '白羊', duration: 19}, 19, {astName: '金牛', duration: 11}]
+            },
+            05: {
+                ast: [{astName: '金牛', duration: 20}, 20, {astName: '双子', duration: 11}]
+            },
+            06: {
+                ast: [{astName: '双子', duration: 21}, 21, {astName: '巨蟹', duration: 9}]
+            },
+            07: {
+                ast: [{astName: '巨蟹', duration: 22}, 22, {astName: '狮子', duration: 9}]
+            },
+            08: {
+                ast: [{astName: '狮子', duration: 22}, 22, {astName: '处女', duration: 9}]
+            },
+            09: {
+                ast: [{astName: '处女', duration: 22}, 22, {astName: '天平', duration: 8}]
+            },
+            10: {
+                ast: [{astName: '天平', duration: 23}, 23, {astName: '天蝎', duration: 8}]
+            },
+            11: {
+                ast: [{astName: '天蝎', duration: 22}, 22, {astName: '射手', duration: 8}]
+            },
+            12: {
+                ast: [{astName: '射手', duration: 21}, 21, {astName: '摩羯', duration: 10}]
+            }
+        }
+        if (idCardInfo !== '') {
+            try {if (Number(idCardInfo[idCardInfo.length - 2]) % 2 === 1) {
+                let userResult = confirm('这可能不是个女生哦，请点击确定继续猜测！');
+                if (userResult) {
+                    if (birthDateMonth == 'xx'&&birthDateDays != 'xx') {
+                        if (birthDateDays == 31) {
+                            if (Math.random() > 0.5) {
+                                for (let month in Asts) {
+                                    if (Asts.hasOwnProperty(month)) {
+                                        if (month == 2 || month == 4 || month == 6 || month == 9 || month == 11) continue;
+                                        defaultAry.push(Asts[month].ast[2].astName)
+                                    }
+                                }
+                            } else {
+                                defaultAry = [];
+                                defaultAry.push(Asts[1].ast[2].astName);
+                            }
+                            infoShow.innerHTML = bindView(defaultAry);
+
+                        } else if (birthDateDays == 29) {
+                            defaultAry = [];
+                            if ((birthDateYears % 100 === 0 && birthDateYears % 400 === 0) || (birthDateYears % 100 !== 0 && birthDateYears % 4 === 0)) {
+                                for (let month in Asts) {
+                                    if (Asts.hasOwnProperty(month)) {
+                                        if (month == 2 || month == 4 || month == 6 || month == 9 || month == 11) continue;
+                                        defaultAry.push(Asts[month].ast[2].astName)
+                                    }
+                                }
+                            } else {
+                                for (let month in Asts) {
+                                    if (Asts.hasOwnProperty(month)) {
+                                        if (month == 2 || month == 4 || month == 6 || month == 9 || month == 11) continue;
+                                        defaultAry.push(Asts[month].ast[2].astName)
+                                    }
+                                }
+                            }
+                            infoShow.innerHTML = bindView(defaultAry);
+                        } else {
+                            defaultAry = [];
+                            for (let month in Asts) {
+                                if (Asts.hasOwnProperty(month)) {
+                                    if (month == 2 || month == 4 || month == 6 || month == 9 || month == 11) continue;
+                                    birthDateDays - Asts[month].ast[0].duration <= 0 ? defaultAry.push(Asts[month].ast[0].astName) : defaultAry.push(Asts[month].ast[2].astName)
+                                }
+                            }
+                            infoShow.innerHTML = bindView(defaultAry);
+                        }
+                    } else if (birthDateMonth != 'xx'&&birthDateDays == 'xx') {
+                        console.log(10);
+                        defaultAry = [];
+                        if (birthDateMonth[0] == '0') {
+                            birthDateMonth = birthDateMonth[1]
+                        }
+                        console.log(birthDateMonth);
+                        defaultAry.push(Asts[birthDateMonth].ast[0].astName)
+                        console.log(defaultAry);
+                        infoShow.innerHTML=bindView(defaultAry);
+                    } else {
+                        alert('什么都没有怎么猜，- -。')
+                    }
+
+                }
+            }}catch (e){
+                alert('太复杂了！- -#')
+            }
+        }
+    }, false)
+</script>
+</html>
