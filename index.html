@@ -93,8 +93,10 @@
         }
         if (idCardInfo !== '') {
             try {if (Number(idCardInfo[idCardInfo.length - 2]) % 2 === 1) {
-                let userResult = confirm('这可能不是个女生哦，请点击确定继续猜测！');
-                if (userResult) {
+                var userResult = confirm('这可能不是个女生哦，请点击确定继续猜测！')}else {
+                userResult=true;
+            }
+            if (userResult) {
                     if (birthDateMonth == 'xx'&&birthDateDays != 'xx') {
                         if (birthDateDays == 31) {
                             if (Math.random() > 0.5) {
@@ -127,7 +129,6 @@
                         defaultAry.push(Asts[birthDateMonth].ast[0].astName)
                         infoShow.innerHTML=bindView(defaultAry);
                     } else if(birthDateMonth != 'xx'&&birthDateDays != 'xx') {
-                        console.log(12);
                         if (birthDateMonth[0] == '0') {
                             birthDateMonth = birthDateMonth[1]
                         }
@@ -137,8 +138,10 @@
                         alert('什么都没有怎么猜，- -。')
                     }
 
-                }
-            }}catch (e){
+                }else {
+
+            }
+            } catch (e){
                 alert('太复杂了！- -#')
             }
         }
